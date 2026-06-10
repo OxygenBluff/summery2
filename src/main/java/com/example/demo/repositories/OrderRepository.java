@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.example.demo.entities.Order;
+import com.example.demo.entities.OrderType;
 import com.example.demo.entities.Product;
+import com.example.demo.entities.Seller;
 import com.example.demo.entities.StatutCommande;
 import com.example.demo.entities.User;
 
@@ -25,8 +27,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	List<Order> findByCustomerIdOrderByDateCommandeDesc(Long customerId);
 	
 	
+	//get from a specific BRANCH = seller -------------
 	
+	// new! get all orders for a specific branch
+	List<Order> findByBranchOrderByDateCommandeDesc(Seller branch);
+
+	// new! count orders by branch and status
+	Long countByBranchAndStatut(Seller branch, StatutCommande statut);
+
+	// new! get orders by type
+	List<Order> findByOrderType(OrderType orderType);
+
+	// new! get pickup orders for a branch
+	List<Order> findByBranchAndOrderType(Seller branch, OrderType orderType);
 	
+	///UNDERSTAND IT BETTER PLSSS +++++++
 	
 	//the dahsboard stuff is actaully complicated..
 	//so ADMIN -> only revenue total

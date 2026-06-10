@@ -35,6 +35,8 @@ public interface ProductRepository extends JpaRepository<Product,Long>,JpaSpecif
 	
 	//All products, + filtres .. category, price min/max, promo, sellerId
 	@Query("SELECT p FROM Product p WHERE "+
+		    "(:q IS NULL OR LOWER(p.nom) LIKE LOWER(CONCAT('%', :q, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :q, '%'))) AND "+
+
 			"(:category IS NULL OR EXISTS (SELECT c FROM p.categories c WHERE c.nom= :category)) AND "+
 			"(:minPrice IS NULL OR p.prix >= :minPrice) AND "+
 			"(:maxPrice IS NULL OR p.prix <= :maxPrice) AND " +

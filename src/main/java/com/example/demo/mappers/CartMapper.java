@@ -1,5 +1,6 @@
 package com.example.demo.mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,9 +10,15 @@ import com.example.demo.dtos.CartItemResponseDTO;
 import com.example.demo.dtos.CartResponseDTO;
 import com.example.demo.entities.Cart;
 import com.example.demo.entities.CartItem;
+import com.example.demo.entities.Customization;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class CartMapper {
+    private final CustomizationMapper customizationMapper;
+
 	//from cart Entity -> cart response DTO 
 	public CartResponseDTO toResponseDTO(Cart cart) {
 		if (cart==null) return null; 
@@ -58,8 +65,7 @@ public class CartMapper {
             price += item.getVariant().getPrixDelta();
         }
         
-        dto.setUnitPrice(price);
-        dto.setSubTotal(price * item.getQuantite());
+        
         
         //what if no iamges ? -> fall back!!
         if (item.getProduct().getImages() != null && !item.getProduct().getImages().isEmpty()) {
@@ -72,6 +78,23 @@ public class CartMapper {
             dto.setVariantName(item.getVariant().getValeur()); // e.g., "Red"
         }
         
+        //customizations ADD PRICE! 
+        if(item.getCustomizations() != null && !item.getCustomizations().isEmpty()) {
+        	double customizationsCost = item.getCustomizations().stream()
+        			.mapToDouble(Customization::getExtraPrice)
+        			.sum();
+        	price+=customizationsCost;
+        }
+        
+        dto.setUnitPrice(price);
+        dto.setSubTotal(price * item.getQuantite());
+        
+        dto.setCustomizations(
+        	    item.getCustomizations() != null ?
+        	    item.getCustomizations().stream()
+        	        .map(customizationMapper::toResponseDTO)
+        	        .toList() : new ArrayList<>()
+        	);
         
         return dto;
         

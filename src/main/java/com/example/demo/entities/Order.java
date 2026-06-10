@@ -81,7 +81,7 @@ public class Order {
 	private LocalDateTime pickupTime;
 	
 	@Enumerated(EnumType.STRING)
-	private OrderType ordertype;
+	private OrderType OrderType;
 	//THIS DEFINES! PICKUP or DELIVERY order! 
 	
 

@@ -9,8 +9,14 @@ import com.example.demo.dtos.OrderResponseDTO;
 import com.example.demo.entities.Order;
 import com.example.demo.entities.OrderItem;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
+
 public class OrderMapper {
+	
+	private final OrderItemMapper orderItemMapper;
 	
 	//order entity -> OrderResponseDTO
 	public OrderResponseDTO toResponseDTO(Order order) {
@@ -21,14 +27,24 @@ public class OrderMapper {
                 .orderDate(order.getDateCommande())
                 .status(order.getStatut().toString())
                 .totalAmount(order.getTotalTTC())
+                //LEMON
+                .branchId(order.getBranch() !=null ? order.getBranch().getId() : null)
+                .branchName(order.getBranch() !=null ? order.getBranch().getNomBoutique() : null)
+
+                .pickupTime(order.getPickupTime())
+                
+                .orderType(order.getOrdertype())
+                
                 .items(order.getLignes() != null ? 
                        order.getLignes().stream()
-                            .map(this::toCartItemResponseDTO)
+                            .map(orderItemMapper::toResponseDTO)
                             .collect(Collectors.toList()) : null)
                 .build();
 	}
 	
 	
+	
+	//NOT NEEDED
 	//helper cartItem  -> cartItemResponseDTO
 	private CartItemResponseDTO toCartItemResponseDTO(OrderItem item) {
         if (item == null) return null;

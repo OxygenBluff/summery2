@@ -1,5 +1,7 @@
 package com.example.demo.dtos;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +21,8 @@ public class CartItemResponseDTO {
     private Integer quantity;
     private Double subTotal; //qte * prix uniatire 
     private String imageUrl; //oops..
+    
+    private List<CustomizationResponseDTO> customizations; 
+
 
 }

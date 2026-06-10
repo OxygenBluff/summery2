@@ -1,11 +1,16 @@
 package com.example.demo.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +45,15 @@ public class CartItem {
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="variant_id",nullable=true)//variant_id null means has no variants! 
 	private ProductVariant variant;
+	
+	//customizations 
+	@ManyToMany
+	@JoinTable(
+			name="cart_item_customizations",
+			joinColumns=@JoinColumn(name="cart_item_id"),
+			inverseJoinColumns=@JoinColumn(name="customization_id")
+			)
+	private List<Customization> customizations= new ArrayList<>();
 	
 	
 	
