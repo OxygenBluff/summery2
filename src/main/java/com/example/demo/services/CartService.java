@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
@@ -12,13 +13,14 @@ import com.example.demo.dtos.CartResponseDTO;
 import com.example.demo.entities.Cart;
 import com.example.demo.entities.CartItem;
 import com.example.demo.entities.Coupon;
+import com.example.demo.entities.Customization;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.User;
 import com.example.demo.mappers.CartMapper;
 import com.example.demo.repositories.CartRepository;
+import com.example.demo.repositories.CustomizationRepository;
 import com.example.demo.repositories.ProductRepository;
 import com.example.demo.repositories.ProductVariantRepository;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +36,8 @@ public class CartService {
     private final CouponService couponService;
     
     private final CartMapper cartMapper;
+    private final CustomizationRepository customizationRepo;
+
 
     public CartResponseDTO addItemToCart(User customer, CartItemRequestDTO request) {
         //  Get / Create Cart
@@ -90,6 +94,12 @@ public class CartService {
                 newItem.setVariant(variantRepo.findById(request.getVariantId())
                 		.orElseThrow(() -> new RuntimeException("Fatal: Variant not found with ID: " + request.getVariantId()))
                 		);
+            }
+            
+            //customizations to the cartItem 
+            if (request.getCustomizationIds() != null && !request.getCustomizationIds().isEmpty()) {
+                List<Customization> customizations = customizationRepo.findAllById(request.getCustomizationIds());
+                newItem.setCustomizations(customizations);
             }
             
             cart.getLignes().add(newItem);

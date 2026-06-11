@@ -6,17 +6,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity @Setter @Getter 
+@Entity @Setter @Getter  @Builder @NoArgsConstructor @AllArgsConstructor
 public class Customization {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name; // Ex: "extra syrup pump america hell yeah"
 	private Double extraPrice; 
-	private boolean is_available; 
+	private boolean available; 
 	
 	//relationship with product (=JUICE) 
 	//a prudct -> many customization from this pov many to one 

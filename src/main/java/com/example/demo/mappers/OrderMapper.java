@@ -33,7 +33,7 @@ public class OrderMapper {
 
                 .pickupTime(order.getPickupTime())
                 
-                .orderType(order.getOrdertype())
+                .orderType(order.getOrderType())
                 
                 .items(order.getLignes() != null ? 
                        order.getLignes().stream()

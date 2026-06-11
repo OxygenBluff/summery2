@@ -52,7 +52,7 @@ public class DashboardService {
     	//-chiffre d'affaires:
     	//somme de TotalTTC + statut = paid, also shipped ..
     	Double revenue = orderRepo.sumPlatformRevenue(
-    			List.of(StatutCommande.PAID, StatutCommande.SHIPPED)
+    			List.of(StatutCommande.PAID, StatutCommande.DELIVERED)
     			);
     	
     	//-recent commandes
@@ -79,7 +79,7 @@ public class DashboardService {
     	
     	Double revenue = orderRepo.sumSellerRevenue(
     			seller.getId(),
-    			List.of(StatutCommande.PAID, StatutCommande.SHIPPED)
+    			List.of(StatutCommande.PAID, StatutCommande.DELIVERED)
     			);
     	
     	return SellerDashboardDTO.builder()
@@ -98,7 +98,7 @@ public class DashboardService {
     	//-current orders 
     	List<OrderResponseDTO> currentOrders = orderRepo.findByCustomerIdOrderByDateCommandeDesc(customerId)
                 .stream()
-                .filter(o -> o.getStatut() == StatutCommande.PENDING || o.getStatut() == StatutCommande.SHIPPED)
+                .filter(o -> o.getStatut() == StatutCommande.PENDING || o.getStatut() == StatutCommande.DELIVERED)
                 .map(orderMapper::toResponseDTO)
                 .toList();
     	

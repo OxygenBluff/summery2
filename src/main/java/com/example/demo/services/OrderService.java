@@ -15,8 +15,10 @@ import com.example.demo.dtos.OrderResponseDTO;
 import com.example.demo.entities.Address;
 import com.example.demo.entities.Cart;
 import com.example.demo.entities.CartItem;
+import com.example.demo.entities.Customization;
 import com.example.demo.entities.Order;
 import com.example.demo.entities.OrderItem;
+import com.example.demo.entities.OrderType;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.StatutCommande;
 import com.example.demo.entities.User;
@@ -25,6 +27,7 @@ import com.example.demo.repositories.AddressRepository;
 import com.example.demo.repositories.CartRepository;
 import com.example.demo.repositories.OrderRepository;
 import com.example.demo.repositories.ProductRepository;
+import com.example.demo.repositories.SellerRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +42,9 @@ public class OrderService {
     private final AddressRepository addressRepo;
     
     private final OrderMapper orderMapper;
+    
+    private final SellerRepository sellerRepo;
+   
 	
 	//format de commande ORD-2026-XXXXX
 	public String generateOrderNumber() {
@@ -61,9 +67,17 @@ public class OrderService {
 		if (cart.getLignes().isEmpty()) throw new RuntimeException("Panier vide");
 		
 		//addresse doit etre valide! !
-		Address address = addressRepo.findById(request.getAddressId())
-                .orElseThrow(() -> new RuntimeException("Adresse invalide"));
+		//LEMOANDE! address optional only for delivery not pickup 
+		String DeliveryAddress=null; 
+		//BY DEFAULT null = pickup else it just changes here
 		
+		if(request.getOrderType() == OrderType.DELIVERY) {
+			Address address = addressRepo.findById(request.getAddressId())
+		            .orElseThrow(() -> new RuntimeException("Invalid Address"));
+			
+			DeliveryAddress=address.getRue() +", " + address.getVille() + " " + address.getCodePostal();
+					
+		}
 		//TODO CUSTOM EXCEPTIONS
 		
 		//new order finally..
@@ -72,10 +86,14 @@ public class OrderService {
 	            .customer(customer)
 	            .numeroCommande(generateOrderNumber())
 	            //address livrasion -> rue,ville,code postal i guess
-	            .adresseLivraison(address.getRue() + ", " + address.getVille() + " " + address.getCodePostal())
+	            .adresseLivraison(DeliveryAddress)
+	            .OrderType(request.getOrderType())
+	            .pickupTime(request.getPickupTime())
+	            .branch(sellerRepo.findById(request.getBranchId())
+	            	    .orElseThrow(() -> new RuntimeException("Branch not found")))
 	            .statut(StatutCommande.PENDING)
 	            .lignes(new ArrayList<>()) //new list Builder. soemthing thingy
-	            .fraisLivraison(7.0) // ?? min 7DT .. TODO what is it?
+	            .fraisLivraison(request.getOrderType() == OrderType.DELIVERY ? 7.0 : 0.0) // ?? min 7DT .. TODO what is it?
 	            .dateCommande(LocalDateTime.now())//PRE PERSIST DOESNT DO IT ?
 	            .build();
 		
@@ -102,6 +120,10 @@ public class OrderService {
 	                .variant(cartItem.getVariant())
 	                .quantite(cartItem.getQuantite())
 	                .prixUnitaire(product.getPrix()) // PRICE IS FORZEN AND SET§§
+	                .customizations(cartItem.getCustomizations()) // SAME FROM CART!!
+	                .customizationsCost(cartItem.getCustomizations().stream()
+	                        .mapToDouble(Customization::getExtraPrice)
+	                        .sum())
 	                .build();
 	        
 	        //-> add to order 

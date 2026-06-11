@@ -1,5 +1,7 @@
 package com.example.demo.dtos;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +15,8 @@ public class CartItemRequestDTO {
 	private Long productId;
     private Long variantId; // NULL si produit n'a pas de variants!!
     private Integer quantity;
+    
+    private List<Long> customizationIds;
 }
 
 //what the helly is CartItem vs cart ??

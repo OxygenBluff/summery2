@@ -20,7 +20,7 @@ public class CustomizationMapper {
 				.id(entity.getId())
 				.name(entity.getName())
 		        .extraPrice(entity.getExtraPrice())
-		        .is_available(entity.is_available())
+		        .available(entity.isAvailable())
 		        .build();
 
 	}
@@ -33,7 +33,7 @@ public class CustomizationMapper {
 		Customization customization = new Customization();
 		customization.setName(dto.getName());
         customization.setExtraPrice(dto.getExtraPrice());
-        customization.set_available(dto.is_available());
+        customization.setAvailable(dto.isAvailable());
         return customization;
 		
 	}

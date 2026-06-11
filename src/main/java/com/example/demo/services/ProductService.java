@@ -13,15 +13,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dtos.CategoryResponseDTO;
+import com.example.demo.dtos.CustomizationResponseDTO;
 import com.example.demo.dtos.ProductRequestDTO;
 import com.example.demo.dtos.ProductResponseDTO;
 import com.example.demo.dtos.VariantResponseDTO;
 import com.example.demo.entities.Category;
+import com.example.demo.entities.Customization;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.ProductVariant;
 import com.example.demo.entities.Review;
 import com.example.demo.entities.Seller;
 import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.mappers.CustomizationMapper;
 import com.example.demo.mappers.ProductMapper;
 import com.example.demo.mappers.ProductVariantMapper;
 import com.example.demo.mappers.ReviewMapper;
@@ -45,6 +48,8 @@ public class ProductService {
     private final ProductVariantMapper variantMapper;
     private final ReviewMapper reviewMapper;
     
+    private final CustomizationMapper customizationMapper;
+
     @Transactional 
     public ProductResponseDTO createProduct(ProductRequestDTO dto,Long userId) {
     	//to create new product -> find who is the seller from the id
@@ -90,6 +95,20 @@ public class ProductService {
     		product.setVariants(variants);
     	}
     	
+    	//LINK: customizations 
+    	if (dto.getCustomizations()!=null && !dto.getCustomizations().isEmpty()) {
+    		List<Customization> customizations = dto.getCustomizations().stream()
+    				.map(cDTO -> Customization.builder()
+    						.name(cDTO.getName())
+    						.extraPrice(cDTO.getExtraPrice())
+    	                    .available(cDTO.isAvailable())
+    	                    .product(product) 
+    	                    .build())
+    					.toList();
+    		
+    		product.setCustomizations(customizations);
+    	}
+    	
     	Product savedProduct= productRepo.save(product);
     	
     	return mapToResponseDTO(savedProduct);
@@ -128,6 +147,17 @@ public class ProductService {
                         //SAME FOR VAIRANTS TO CUT RECUSRION! 
                         //-> Product field not included 
                         .collect(Collectors.toList()))
+                
+                
+                .customizations(p.getCustomizations() != null ?
+                	    p.getCustomizations().stream()
+                	        .map(c -> CustomizationResponseDTO.builder()
+                	                .id(c.getId())
+                	                .name(c.getName())
+                	                .extraPrice(c.getExtraPrice())
+                	                .available(c.isAvailable())
+                	                .build())
+                	        .toList() : new ArrayList<>())
                 .build();
     	
     }  
@@ -191,6 +221,17 @@ public class ProductService {
     			});
   
     	}
+    	//customizations 
+    	existingProduct.getCustomizations().clear();
+    	if(dto.getCustomizations()!=null) {
+    		dto.getCustomizations().stream()
+    		.map(customizationMapper::toEntity)
+    		.forEach(customization ->{
+    			customization.setProduct(existingProduct);
+    			existingProduct.getCustomizations().add(customization);
+    		});
+    	}
+    	
     	Product updated = productRepo.save(existingProduct);
     	return productMapper.toResponseDTO(updated);
     	
