@@ -315,6 +315,14 @@ public class ProductService {
     	//page of entities now !! -> page of DTOS remember.. 
     	return productPage.map(productMapper::toResponseDTO);
     }
+
+	public List<ProductResponseDTO> getDiscountedProducts(){
+		//just convert
+		return productRepo.findAllByPrixPromoIsNotNullAndActifTrue().stream()
+				.map(productMapper::toResponseDTO)
+				.toList();
+	}
+
     
    
 }

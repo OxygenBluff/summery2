@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### Thymealeaf legacy tempaltes ###
+src/main/resources/templates/
+src/main/resources/static/
+

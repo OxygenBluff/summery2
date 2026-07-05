@@ -153,7 +153,7 @@ public class AuthController {
 
 	@GetMapping("/seller-dashboard")
 	public String sellerDashboard() {
-	    return "seller-dashboard"; // You'll build this next
+	    return "seller-dashboard";
 	}
 
 	@GetMapping("/post-product")

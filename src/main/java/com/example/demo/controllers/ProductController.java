@@ -1,9 +1,12 @@
 package com.example.demo.controllers;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.example.demo.repositories.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
 	
 	private final ProductService productService;
+	private final ProductRepository productRepository;
 	//jsut a remidner Response Entity ? 
 	//-> = HTTP ENVELOPE ! body (json data) + status code + THE HEADERS !!
 	//<> = type safety, what's inside that envolope :) 
@@ -114,7 +118,20 @@ public class ProductController {
 		    @RequestParam(required = false) Boolean promo,
 		    Pageable pageable // the ?page= & size thingy 
 			){
-		return ResponseEntity.ok(productService.getAllProducts(q,category, minPrice, maxPrice,minNote, sellerId, promo, pageable));
+
+		return ResponseEntity.ok()
+				.cacheControl(CacheControl.maxAge(0, TimeUnit.SECONDS).cachePrivate().mustRevalidate())
+				.body(productService.getAllProducts(q, category, minPrice, maxPrice, minNote, sellerId, promo, pageable))
+				;
+	}
+
+	//Intellij era!
+	@GetMapping("/Featured")
+	public ResponseEntity<List<ProductResponseDTO>> getFeaturedProducts(){
+		return ResponseEntity.ok(
+				productService.getDiscountedProducts()
+		);
+
 	}
 	
 	

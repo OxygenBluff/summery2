@@ -47,8 +47,16 @@ public class SecurityConfiguration {
 		.csrf(csrf->csrf.disable())//stateless API -> disable CSRF, cross site request forgery
 		.authorizeHttpRequests(auth->auth
 				//1-REST API (AuthenticationController)
-				.requestMatchers("/api/auth/**").permitAll()//allow ath apis 
-				
+				// ---- CLEAN UP !!
+				//-> Auth + swagger + H2 + error to keep
+				.requestMatchers("/api/auth/**").permitAll()//allow ath apis
+				.requestMatchers("/swagger-ui/**","/swagger-ui.html","/v3/api-docs/").permitAll()
+				.requestMatchers("/h2-console/**").permitAll()
+				.requestMatchers("/error").permitAll()
+
+
+
+
 				.requestMatchers("/api/coupon/**").authenticated()
 				.requestMatchers("/checkout").permitAll()
 				.requestMatchers("/api/addresses/**").authenticated()
@@ -73,7 +81,7 @@ public class SecurityConfiguration {
 				.requestMatchers("/home").permitAll()
 				.requestMatchers("/become-seller").permitAll()
 				.requestMatchers("/post-product").permitAll()
-				.requestMatchers("/swagger-ui/**","/v3/api-docs/").permitAll()
+
 				.requestMatchers("/api/dashboard/seller").permitAll()
 				.requestMatchers("/api/dashboard/admin").permitAll()
 				//(e.g., /swagger-ui/**, /v3/api-docs/**)
@@ -84,7 +92,7 @@ public class SecurityConfiguration {
 				.requestMatchers("/swagger-ui.html").permitAll()
 				.requestMatchers("/v3/api-docs/**").permitAll()
 				
-				.requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+				.requestMatchers(HttpMethod.GET, "/api/products/**").authenticated() //
 			    .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 			    
 			    //TODO TEMPORARY
@@ -93,8 +101,7 @@ public class SecurityConfiguration {
 			    //.requestMatchers("/api/cart/**").hasRole("CUSTOMER")
 				
 				
-				//3-H2
-				.requestMatchers("/h2-console/**").permitAll() // IT BLOCKED H2 LOOOL
+
 				
 				//4-CSS, JS, images (static)
 				.requestMatchers("/css/**", "/js/**", "/img/**","/favicon.ico").permitAll() // the usual.. 

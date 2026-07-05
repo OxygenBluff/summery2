@@ -76,7 +76,9 @@ public interface ProductRepository extends JpaRepository<Product,Long>,JpaSpecif
 	
 	
 	List<Product> findBySellerAndStockLessThanEqual(Seller seller, int threshold);
-	
+
+	//featured = discounted products i guess
+	List<Product> findAllByPrixPromoIsNotNullAndActifTrue();
 	
 	
 	
